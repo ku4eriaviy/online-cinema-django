@@ -1,0 +1,53 @@
+{% load static custom_filters %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Онлайн-кинотеатр</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <header>
+        <h1>Онлайн-кинотеатр</h1>
+        <p>Выберите жанр и наслаждайтесь фильмами!</p>
+    </header>
+
+    <main>
+        <form method="get" class="genre-form">
+            <label for="genre">Жанр:</label>
+            <select name="genre" id="genre" onchange="this.form.submit()">
+                {% for key, name in genres.items %}
+                    <option value="{{ key }}" {% if key == selected_genre %}selected{% endif %}>
+                        {{ name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </form>
+
+        <div class="movies-grid">
+            {% for movie in movies %}
+                <div class="movie-card">
+                    <img src="{% static 'images/'|add:movie.poster %}" 
+                         onerror="this.src='https://via.placeholder.com/180x270?text=Постер+недоступен'" 
+                         alt="{{ movie.title }}">
+                    <h3>{{ movie.title }}</h3>
+                    <p class="year">({{ movie.year }})</p>
+                    <p class="genre">Жанр: {{ genres|get_item:movie.genre }}</p>
+                </div>
+            {% empty %}
+                <p class="no-movies">Фильмы не найдены.</p>
+            {% endfor %}
+        </div>
+    </main>
+
+    <footer>
+        {% if request.COOKIES.last_genre %}
+            <p>Последний выбранный жанр: <strong>{{ genres|get_item:request.COOKIES.last_genre }}</strong></p>
+        {% else %}
+            <p>Выберите жанр, чтобы начать!</p>
+        {% endif %}
+    </footer>
+</body>
+</html>
